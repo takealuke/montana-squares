@@ -21,28 +21,54 @@
 </body>
 
 <script type="text/javascript">
-    $(document).ready(function () {
-        var size = 30;
 
+    $(document).ready(function () {
+		//get a random number for each user. use this number to identify their squares. you will also need to assign them a color. random? or let them choose? OR...identify the square by location only(?)
+		//really? all this?
+		// function randomString(length, chars) { var result = ''; for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)]; return result; } 
+		// 	var rString = randomString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+
+        var size = 30;
+		var database = firebase.database();
+		var squareList = database.ref('users/squares/');
 
         function handleClick (ev) {
-            console.log(ev.clientY, ev.clientX);
             var top = (ev.clientY - (size/2));
             var left = (ev.clientX - (size/2));
+            var color = '#990000';
             var square = $('<div style="' +
                            'position: absolute; ' +
                            'width: '+ size + 'px; ' +
                            'height: ' + size + 'px; ' +
-                           'background-color: #990000; ' +
+                           'background-color: ' + color + '; ' +
                            'top:' + top + 'px;' +
                            'left:' + left + 'px;"' +
                            '></div>');
-            console.log(square.get(0));
-            $('body').append(square);       
-        }
+
+    	    function writeSquareData(left, top, color) {
+    	    	squareList.push({
+    	    		x: left,
+    	    		y: top,
+    	    		color: color
+    	    	});
+    	    };
+
+            // if (!square at (top,left)):
+    	    //    write to DB
+            writeSquareData(left, top, color);
+            //    and add a square to the screen
+            // console.log(square.get(0));
+            $('body').append(square);
+
+    	    //    add a listener to enemy squares (or all squares?)
+            // else
+            // 	   delete square on screen and in DB
+    
+        };
         var clickArea = document.getElementById('mainBody');
         clickArea.addEventListener('click', handleClick);
-    })
+
+    });
         
     </script>
 
