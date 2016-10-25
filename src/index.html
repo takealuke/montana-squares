@@ -33,6 +33,7 @@
 		var squareList = database.ref('users/squares/');
 
         function handleClick (ev) {
+        	console.log(ev);
             var top = (ev.clientY - (size/2));
             var left = (ev.clientX - (size/2));
             var color = '#990000';
@@ -49,22 +50,30 @@
     	    	squareList.push({
     	    		x: left,
     	    		y: top,
-    	    		color: color
+    	    		color: color,
     	    	});
     	    };
 
             // if (!square at (top,left)):
     	    //    write to DB
             writeSquareData(left, top, color);
+            // console.log(square.)
             //    and add a square to the screen
-            // console.log(square.get(0));
+            //// console.log(square.get(0));
             $('body').append(square);
 
     	    //    add a listener to enemy squares (or all squares?)
             // else
             // 	   delete square on screen and in DB
-    
+
+            //somehow make squares in DB writeable html
+            squareList.on('value', function(snapshot) {
+            	console.log(snapshot.val());
+            })
+
+   
         };
+
         var clickArea = document.getElementById('mainBody');
         clickArea.addEventListener('click', handleClick);
 
