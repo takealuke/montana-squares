@@ -33,7 +33,6 @@
 		var squareList = database.ref('users/squares/');
 
         function handleClick (ev) {
-        	console.log(ev);
             var top = (ev.clientY - (size/2));
             var left = (ev.clientX - (size/2));
             var color = '#990000';
@@ -46,17 +45,18 @@
                            'left:' + left + 'px;"' +
                            '></div>');
 
-    	    function writeSquareData(left, top, color) {
+    	    function writeSquareData(left, top, color, square) {
     	    	squareList.push({
     	    		x: left,
     	    		y: top,
     	    		color: color,
+    	    		html: square
     	    	});
     	    };
 
             // if (!square at (top,left)):
     	    //    write to DB
-            writeSquareData(left, top, color);
+            writeSquareData(left, top, color, square);
             // console.log(square.)
             //    and add a square to the screen
             //// console.log(square.get(0));
@@ -65,17 +65,26 @@
     	    //    add a listener to enemy squares (or all squares?)
             // else
             // 	   delete square on screen and in DB
-
-            //somehow make squares in DB writeable html
-            squareList.on('value', function(snapshot) {
-            	console.log(snapshot.val());
-            })
-
    
         };
 
         var clickArea = document.getElementById('mainBody');
         clickArea.addEventListener('click', handleClick);
+
+        squareList.on('value', function(snapshot) {
+        	console.log(snapshot.val());
+        	// for (var s=0; s < snapshot.val(); s++) {
+        	// 	var newsquare = $('<div style="' +
+         //                   'position: absolute; ' +
+         //                   'width: '+ size + 'px; ' +
+         //                   'height: ' + size + 'px; ' +
+         //                   'background-color: ' + s.color + '; ' +
+         //                   'top:' + s.top + 'px;' +
+         //                   'left:' + s.left + 'px;"' +
+         //                   '></div>');
+        	// 	$('body').append(newsquare);
+        	// }
+        });
 
     });
         
