@@ -36,30 +36,40 @@
             var top = (ev.clientY - (size/2));
             var left = (ev.clientX - (size/2));
             var color = '#990000';
-    	    function writeSquareData(left, top, color, square) {
-    	    	squareList.push({
+            var thisSquareKey = '';
+            var square = '';
+
+    	    function writeNewSquare(left, top, color) {
+                //data for new square
+    	    	var squareData = {
     	    		x: left,
     	    		y: top,
-    	    		color: color,
-    	    		html: square
-    	    	});
-    	    	return squareList.once('value').then(function(snapshot) {
-    	    		var squareKey = snapshot.val().squareId;
-    	    	})
+    	    		color: color
+    	    	};
+
+                //get a key for the new square
+                var newSquareKey = squareList.child('squares').push().key;
+                thisSquareKey = newSquareKey;
+                //create the square html object
+                square = $('<div id="' + thisSquareKey +'" style="' +
+                               'position: absolute; ' +
+                               'width: '+ size + 'px; ' +
+                               'height: ' + size + 'px; ' +
+                               'background-color: ' + color + '; ' +
+                               'top:' + top + 'px;' +
+                               'left:' + left + 'px;"' +
+                               '></div>');
+
+                //write new square
+                var list = {};
+                list['/users/squares/' + newSquareKey] = squareData;
+                return firebase.database().ref().update(list);
     	    };
-            //squareId is undefined here bc we havent written to the DB
-            var square = $('<div id="' +squareList.squareId +'" style="' +
-                           'position: absolute; ' +
-                           'width: '+ size + 'px; ' +
-                           'height: ' + size + 'px; ' +
-                           'background-color: ' + color + '; ' +
-                           'top:' + top + 'px;' +
-                           'left:' + left + 'px;"' +
-                           '></div>');
+
 
             // if (!square at (top,left)):
     	    //    write to DB
-            writeSquareData(left, top, color, square);
+            writeNewSquare(left, top, color);
             //    and add a square to the screen
             //// console.log(square.get(0));
             $('body').append(square);
@@ -74,6 +84,8 @@
         clickArea.addEventListener('click', handleClick);
 
         //draw all squares in the DB
+        //doesn't matter what you use for squareId and squareData names
+        //now we need to grab the html id from the squares (and write them?)
 		squareList.on('value', function(snapshot) {
 			$.each(snapshot.val(), function(squareId, squareData) {
 				$.each(squareData, function(index, value) {
