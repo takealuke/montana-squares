@@ -36,39 +36,14 @@
             var top = (ev.clientY - (size/2));
             var left = (ev.clientX - (size/2));
             var color = '#990000';
-            var thisSquareKey = '';
-            var square = '';
 
-    	    function writeNewSquare(left, top, color) {
-                //data for new square
-    	    	var squareData = {
-    	    		x: left,
-    	    		y: top,
-    	    		color: color
-    	    	};
-
-                //get a key for the new square
-                var newSquareKey = squareList.child('squares').push().key;
-                thisSquareKey = newSquareKey;
-                //create the square html object
-                //most of this is probably unnecessary at this point --
-                //can probably go back to the original implementation (sometime
-                    // before the squareID got placed onto html ID)
-                square = $('<div id="' + thisSquareKey +'" style="' +
-                               'position: absolute; ' +
-                               'width: '+ size + 'px; ' +
-                               'height: ' + size + 'px; ' +
-                               'background-color: ' + color + '; ' +
-                               'top:' + top + 'px;' +
-                               'left:' + left + 'px;"' +
-                               '></div>');
-
-                //write new square
-                //could most likely be done a lot more efficiently
-                var list = {};
-                list['/users/squares/' + newSquareKey] = squareData;
-                return firebase.database().ref().update(list);
-    	    };
+            function writeNewSquare(left, top, color) {
+                squareList.push({
+                    x: left,
+                    y: top,
+                    color: color
+                });
+            };
 
 
             // if (!square at (top,left)):
