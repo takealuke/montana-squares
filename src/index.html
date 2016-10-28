@@ -51,6 +51,9 @@
                 var newSquareKey = squareList.child('squares').push().key;
                 thisSquareKey = newSquareKey;
                 //create the square html object
+                //most of this is probably unnecessary at this point --
+                //can probably go back to the original implementation (sometime
+                    // before the squareID got placed onto html ID)
                 square = $('<div id="' + thisSquareKey +'" style="' +
                                'position: absolute; ' +
                                'width: '+ size + 'px; ' +
@@ -84,8 +87,7 @@
         var clickArea = document.getElementById('mainBody');
         clickArea.addEventListener('click', handleClick);
 
-        //draw all squares in the DB...but draws them too many times!
-        //need an if exists statement
+        //draw the squares from the DB
         squareList.on('value', function(snapshot) {
             $.each(snapshot.val(), function(squareId, theSquareData) {
                 var square = $('<div id="' + squareId +'" style="' +
@@ -96,7 +98,12 @@
                                'top:' + theSquareData.y + 'px;' +
                                'left:' + theSquareData.x + 'px;"' +
                                '></div>');
-                $('body').append(square);
+                //if this square already exists, don't draw it
+                if ($('#' + squareId).length == 0) {
+                    $('body').append(square);
+                } else {
+                    console.log('this square exists already; #' + squareId)
+                    };
             });
         });
 
