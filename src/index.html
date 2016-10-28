@@ -86,11 +86,12 @@
         //draw all squares in the DB
         //doesn't matter what you use for squareId and squareData names
         //now we need to grab the html id from the squares (and write them?)
+        //what was my idea here? how to use html ID?
 		squareList.on('value', function(snapshot) {
-			$.each(snapshot.val(), function(squareId, squareData) {
-				$.each(squareData, function(index, value) {
-					console.log(value);
-				});
+			$.each(snapshot.val(), function(squareId, theSquareData) {
+                //won't work bc if it's not already on this page, the jquery object isn't returning anything (bc there is no obj with that ID yet). So this plan isn't going to work, though it's probably good to be able to reference the IDs anyways. Do we need to recreate the square div here then?
+                $('body').append($('#' + squareId));
+                console.log(squareId);
 			});
 		});
 
