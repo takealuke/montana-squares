@@ -61,6 +61,7 @@
                                '></div>');
 
                 //write new square
+                //could most likely be done a lot more efficiently
                 var list = {};
                 list['/users/squares/' + newSquareKey] = squareData;
                 return firebase.database().ref().update(list);
@@ -72,7 +73,7 @@
             writeNewSquare(left, top, color);
             //    and add a square to the screen
             //// console.log(square.get(0));
-            $('body').append(square);
+            // $('body').append(square);
 
     	    //    add a listener to enemy squares (or all squares?)
             // else
@@ -83,17 +84,21 @@
         var clickArea = document.getElementById('mainBody');
         clickArea.addEventListener('click', handleClick);
 
-        //draw all squares in the DB
-        //doesn't matter what you use for squareId and squareData names
-        //now we need to grab the html id from the squares (and write them?)
-        //what was my idea here? how to use html ID?
-		squareList.on('value', function(snapshot) {
-			$.each(snapshot.val(), function(squareId, theSquareData) {
-                //won't work bc if it's not already on this page, the jquery object isn't returning anything (bc there is no obj with that ID yet). So this plan isn't going to work, though it's probably good to be able to reference the IDs anyways. Do we need to recreate the square div here then?
-                $('body').append($('#' + squareId));
-                console.log(squareId);
-			});
-		});
+        //draw all squares in the DB...but draws them too many times!
+        //need an if exists statement
+        squareList.on('value', function(snapshot) {
+            $.each(snapshot.val(), function(squareId, theSquareData) {
+                var square = $('<div id="' + squareId +'" style="' +
+                               'position: absolute; ' +
+                               'width: '+ size + 'px; ' +
+                               'height: ' + size + 'px; ' +
+                               'background-color: ' + theSquareData.color + '; ' +
+                               'top:' + theSquareData.y + 'px;' +
+                               'left:' + theSquareData.x + 'px;"' +
+                               '></div>');
+                $('body').append(square);
+            });
+        });
 
 
     });
