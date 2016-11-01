@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>
-        Montana
+        Squares
     </title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.5.1/firebase.js"></script>
@@ -23,39 +23,47 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-		//get a random number for each user. use this number to identify their squares. you will also need to assign them a color. random? or let them choose? OR...identify the square by location only(?)
-		//really? all this?
-		// function randomString(length, chars) { var result = ''; for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)]; return result; } 
-		// 	var rString = randomString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        //this function runs when the doc is ready -- but it doesn't run every
+        //  time something changes in the doc!
+
+        //so yeah, just create a rando number and assign it a beautiful color
+
+        //Get a user ID
+        //how to ensure it's unique?
+		function randomString(length, chars) { 
+            var result = ''; 
+            for (var i = length; i > 0; --i) 
+                result += chars[Math.floor(Math.random() * chars.length)]; 
+            return result; } 
+		var userId = randomString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        console.log(userId);
+
+        //get a unique color for each user
+        //how to make unique?...hmmmmmmmmm use an array? of like, lots and lots but not infinitely many and remove from array when user is on page, add when user leaves.
+        var color = '#'+Math.random().toString(16).substr(-6);
 
         var size = 30;
 		var database = firebase.database();
-		var squareList = database.ref('users/squares/');
+		var squareList = database.ref('/squares/');
 
         function handleClick (ev) {
             var top = (ev.clientY - (size/2));
             var left = (ev.clientX - (size/2));
-            var color = '#990000';
+            // var color = '#990000';
 
-            function writeNewSquare(left, top, color) {
+            function writeNewSquare(left, top, color, userId) {
                 squareList.push({
                     x: left,
                     y: top,
-                    color: color
+                    color: color,
+                    user: userId
                 });
             };
 
 
-            // if (!square at (top,left)):
-    	    //    write to DB
-            writeNewSquare(left, top, color);
-            //    and add a square to the screen
-            //// console.log(square.get(0));
-            // $('body').append(square);
+            writeNewSquare(left, top, color, userId);
 
-    	    //    add a listener to enemy squares (or all squares?)
-            // else
-            // 	   delete square on screen and in DB
+            //add a listener. if userId of clicker matches, do nothing. else delete square from screen and DB
    
         };
 
@@ -64,21 +72,21 @@
 
         //draw the squares from the DB
         squareList.on('value', function(snapshot) {
-            $.each(snapshot.val(), function(squareId, theSquareData) {
+            $.each(snapshot.val(), function(squareId, squareData) {
                 var square = $('<div id="' + squareId +'" style="' +
                                'position: absolute; ' +
                                'width: '+ size + 'px; ' +
                                'height: ' + size + 'px; ' +
-                               'background-color: ' + theSquareData.color + '; ' +
-                               'top:' + theSquareData.y + 'px;' +
-                               'left:' + theSquareData.x + 'px;"' +
+                               'background-color: ' + squareData.color + '; ' +
+                               'top:' + squareData.y + 'px;' +
+                               'left:' + squareData.x + 'px;"' +
                                '></div>');
                 //if this square already exists, don't draw it
                 if ($('#' + squareId).length == 0) {
                     $('body').append(square);
-                } else {
-                    console.log('this square exists already; #' + squareId)
-                    };
+                // } else if squareData.user != userId {
+                //     console.log('delete this square from the screen and db');
+                }
             });
         });
 
