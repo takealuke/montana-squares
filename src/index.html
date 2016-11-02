@@ -97,10 +97,39 @@
                         square.remove();
                         squareList.child(squareId).remove();
 
+                        /**  LUKE: This is great so far
+                         *   you've removed the element from the DB
+                         *   there are a couple ways you could go from here
+                         *   this whole block (starting at: squareList.on('value'))
+                         *   is called when the list changes
+                         *   this includes removals
+                         *   But it would be silly to keep track of everything
+                         *   you've drawn and check which ones are now missing each time.
+                         *   So you could:
+                         *   Option A) delete them ALL and redraw them whenever
+                         *   this block runs
+                         *   Option B) right here (in this click block, within this
+                         *   check for whether this is another user's square)
+                         *   remove the square from the DOM (https://api.jquery.com/remove/)
+                         *
+                         *   Option A is a bit more "MVC" -- the DB model always dictates the view
+                         *   Option B is fine though -- since we are removing from the DB and the DOM in this block
+                         *   although since the removal from the DB is async, this could fail (and then your state is weird)
+                         *   There is also an option "C" which combines the two:
+                         *   squareList.child(squareId).remove() does NOT Promise (promises are cool)
+                         *   but set() does -- setting to null does the same thing as remove
+                         *   so
+                         *   squareList.child(squareId).set(null).then(function () { <delete from DOM here> })
+                         *   this calls the DOM deletion function on successful removal from DB
+                         */
+
                         // prevent the parent .on() function from running needlessly
                         ev.stopPropagation();
 
                         // all pages to check against the DB
+                        /**  LUKE: pretty sure you don't need this here
+                         *   handleClick is for the "body" which is already bound
+                         */
                         handleClick(square);
                     }
                 });
