@@ -36,10 +36,9 @@
                 result += chars[Math.floor(Math.random() * chars.length)]; 
             return result; } 
 		var userId = randomString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-        console.log(userId);
 
         //get a unique color for each user
-        //how to make unique?...hmmmmmmmmm use an array? of like, lots and lots but not infinitely many and remove from array when user is on page, add when user leaves.
+        //how to make unique?...hmmmmmmmmm use an array? of like, lots and lots but not infinitely many colors and remove the color from array when user is on page, add it back to the array when user leaves
         var color = '#'+Math.random().toString(16).substr(-6);
 
         var size = 30;
@@ -49,7 +48,6 @@
         function handleClick (ev) {
             var top = (ev.clientY - (size/2));
             var left = (ev.clientX - (size/2));
-            // var color = '#990000';
 
             function writeNewSquare(left, top, color, userId) {
                 squareList.push({
@@ -60,11 +58,20 @@
                 });
             };
 
+            //if it does exist, delete it! we've already checked that it doesnt exist when we add it originally!
+            // if ($('#' + squareId).length > 0) {
 
-            writeNewSquare(left, top, color, userId);
+            // if the square exists on the page, delete the html element
+            if (ev.target != this) {
+                console.log('shoot her!');
+                ev.remove();
+            } else {
+                //else the square is a brand new baby
+                console.log('create it!');
 
-            //add a listener. if userId of clicker matches, do nothing. else delete square from screen and DB
-   
+                writeNewSquare(left, top, color, userId);
+            };
+               
         };
 
         var clickArea = document.getElementById('mainBody');
@@ -78,12 +85,25 @@
                                'width: '+ size + 'px; ' +
                                'height: ' + size + 'px; ' +
                                'background-color: ' + squareData.color + '; ' +
-                               'top:' + squareData.y + 'px;' +
-                               'left:' + squareData.x + 'px;"' +
+                               'top: ' + squareData.y + 'px;' +
+                               'left: ' + squareData.x + 'px;"' +
                                '></div>');
                 //if this square already exists, don't draw it
                 if ($('#' + squareId).length == 0) {
                     $('body').append(square);
+                //add a listener
+                square.on('click', function(ev) {
+                    if (squareData.user != userId){
+                        square.remove();
+                        squareList.child(squareId).remove();
+
+                        // prevent the parent .on() function from running needlessly
+                        ev.stopPropagation();
+
+                        // all pages to check against the DB
+                        handleClick(square);
+                    }
+                });
                 // } else if squareData.user != userId {
                 //     console.log('delete this square from the screen and db');
                 }
