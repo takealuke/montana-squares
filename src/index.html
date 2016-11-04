@@ -1,4 +1,4 @@
-<html>
+ <html>
 <head>
     <title>
         Squares
@@ -23,27 +23,22 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-        //this function runs when the doc is ready -- but it doesn't run every
-        //  time something changes in the doc!
-
-        //so yeah, just create a rando number and assign it a beautiful color
-
         //Get a user ID
         //how to ensure it's unique?
-		function randomString(length, chars) { 
+        function randomString(length, chars) { 
             var result = ''; 
             for (var i = length; i > 0; --i) 
                 result += chars[Math.floor(Math.random() * chars.length)]; 
             return result; } 
-		var userId = randomString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        var userId = randomString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
-        //get a unique color for each user
-        //how to make unique?...hmmmmmmmmm use an array? of like, lots and lots but not infinitely many colors and remove the color from array when user is on page, add it back to the array when user leaves
+        //get a color for each user
+        //how to make unique?
         var color = '#'+Math.random().toString(16).substr(-6);
 
         var size = 30;
-		var database = firebase.database();
-		var squareList = database.ref('/squares/');
+        var database = firebase.database();
+        var squareList = database.ref('/squares/');
 
         function handleClick (ev) {
             var top = (ev.clientY - (size/2));
@@ -58,19 +53,8 @@
                 });
             };
 
-            //if it does exist, delete it! we've already checked that it doesnt exist when we add it originally!
-            // if ($('#' + squareId).length > 0) {
-
-            // if the square exists on the page, delete the html element
-            if (ev.target != this) {
-                console.log('shoot her!');
-                ev.remove();
-            } else {
-                //else the square is a brand new baby
-                console.log('create it!');
-
-                writeNewSquare(left, top, color, userId);
-            };
+            //write to DB
+            writeNewSquare(left, top, color, userId);
                
         };
 
@@ -79,6 +63,8 @@
 
         //draw the squares from the DB
         squareList.on('value', function(snapshot) {
+            //wont have .each. just create the square
+            console.log(snapshot.val());
             $.each(snapshot.val(), function(squareId, squareData) {
                 var square = $('<div id="' + squareId +'" style="' +
                                'position: absolute; ' +
@@ -88,56 +74,29 @@
                                'top: ' + squareData.y + 'px;' +
                                'left: ' + squareData.x + 'px;"' +
                                '></div>');
+
                 //if this square already exists, don't draw it
                 if ($('#' + squareId).length == 0) {
                     $('body').append(square);
-                //add a listener
+                };
+
+                //add a listener to check if the square belongs to an enemy
                 square.on('click', function(ev) {
                     if (squareData.user != userId){
-                        square.remove();
+                        // remove the square from the DB
                         squareList.child(squareId).remove();
-
-                        /**  LUKE: This is great so far
-                         *   you've removed the element from the DB
-                         *   there are a couple ways you could go from here
-                         *   this whole block (starting at: squareList.on('value'))
-                         *   is called when the list changes
-                         *   this includes removals
-                         *   But it would be silly to keep track of everything
-                         *   you've drawn and check which ones are now missing each time.
-                         *   So you could:
-                         *   Option A) delete them ALL and redraw them whenever
-                         *   this block runs
-                         *   Option B) right here (in this click block, within this
-                         *   check for whether this is another user's square)
-                         *   remove the square from the DOM (https://api.jquery.com/remove/)
-                         *
-                         *   Option A is a bit more "MVC" -- the DB model always dictates the view
-                         *   Option B is fine though -- since we are removing from the DB and the DOM in this block
-                         *   although since the removal from the DB is async, this could fail (and then your state is weird)
-                         *   There is also an option "C" which combines the two:
-                         *   squareList.child(squareId).remove() does NOT Promise (promises are cool)
-                         *   but set() does -- setting to null does the same thing as remove
-                         *   so
-                         *   squareList.child(squareId).set(null).then(function () { <delete from DOM here> })
-                         *   this calls the DOM deletion function on successful removal from DB
-                         */
 
                         // prevent the parent .on() function from running needlessly
                         ev.stopPropagation();
-
-                        // all pages to check against the DB
-                        /**  LUKE: pretty sure you don't need this here
-                         *   handleClick is for the "body" which is already bound
-                         */
-                        handleClick(square);
                     }
                 });
-                // } else if squareData.user != userId {
-                //     console.log('delete this square from the screen and db');
-                }
             });
         });
+
+        //remove squares from the DOM
+        squareList.on('child_removed', function(snapshot) {
+            $('#' + snapshot.key).remove();
+        })
 
 
     });
