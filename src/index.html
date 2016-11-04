@@ -23,6 +23,10 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
+
+        //get a name for the player
+        var person = prompt("Please enter your name", "Harry Potter");
+
         //Get a user ID
         //how to ensure it's unique?
         function randomString(length, chars) { 
@@ -43,18 +47,19 @@
         function handleClick (ev) {
             var top = (ev.clientY - (size/2));
             var left = (ev.clientX - (size/2));
-
-            function writeNewSquare(left, top, color, userId) {
+            
+            function writeNewSquare(left, top, color, userId, person) {
                 squareList.push({
                     x: left,
                     y: top,
                     color: color,
-                    user: userId
+                    user: userId,
+                    name: person
                 });
             };
 
             //write to DB
-            writeNewSquare(left, top, color, userId);
+            writeNewSquare(left, top, color, userId, person);
                
         };
 
