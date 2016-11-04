@@ -61,36 +61,35 @@
         var clickArea = document.getElementById('mainBody');
         clickArea.addEventListener('click', handleClick);
 
-        //draw the squares from the DB
-        squareList.on('value', function(snapshot) {
-            //wont have .each. just create the square
-            console.log(snapshot.val());
-            $.each(snapshot.val(), function(squareId, squareData) {
-                var square = $('<div id="' + squareId +'" style="' +
-                               'position: absolute; ' +
-                               'width: '+ size + 'px; ' +
-                               'height: ' + size + 'px; ' +
-                               'background-color: ' + squareData.color + '; ' +
-                               'top: ' + squareData.y + 'px;' +
-                               'left: ' + squareData.x + 'px;"' +
-                               '></div>');
+        //draw the square that was just added to the DB
+        squareList.on('child_added', function(snapshot) {
 
-                //if this square already exists, don't draw it
-                if ($('#' + squareId).length == 0) {
-                    $('body').append(square);
-                };
+            var square = $('<div id="' + snapshot.key +'" style="' +
+                           'position: absolute; ' +
+                           'width: '+ size + 'px; ' +
+                           'height: ' + size + 'px; ' +
+                           'background-color: ' + snapshot.val().color + '; ' +
+                           'top: ' + snapshot.val().y + 'px;' +
+                           'left: ' + snapshot.val().x + 'px;"' +
+                           '></div>');
 
-                //add a listener to check if the square belongs to an enemy
-                square.on('click', function(ev) {
-                    if (squareData.user != userId){
-                        // remove the square from the DB
-                        squareList.child(squareId).remove();
+            //if this square already exists, don't draw it
+            if ($('#' + snapshot.key).length == 0) {
+                console.log(square);
+                $('body').append(square);
+            };
 
-                        // prevent the parent .on() function from running needlessly
-                        ev.stopPropagation();
-                    }
-                });
+            //add a listener to check if the square belongs to an enemy
+            square.on('click', function(ev) {
+                if (snapshot.val().user != userId){
+                    // remove the square from the DB
+                    squareList.child(snapshot.key).remove();
+
+                    // prevent the parent .on() function from running needlessly
+                    ev.stopPropagation();
+                }
             });
+
         });
 
         //remove squares from the DOM
