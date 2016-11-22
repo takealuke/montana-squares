@@ -46,9 +46,9 @@
         var squareList = database.ref('/squares/');
 
         function handleClick (ev) {
-            //Handle coordinates from scrolling 
+            //Handle coordinates from scrolling; not robust for all browsers
             var scrollTop = window.pageYOffset //|| docElem.scrollTop || body.scrollTop
-            console.log('scrollTop: ' + scrollTop);
+            // console.log('scrollTop: ' + scrollTop);
             var scrollLeft = window.pageXOffset //|| docElem.scrollLeft || body.scrollLeft
 
             //do math for the scrolling offset and to get the point at the center of the square
@@ -70,7 +70,8 @@
                
         };
 
-        var clickArea = document.getElementById('mainBody');
+        //define clickArea as BOM (Browser Object Model aka window)
+        var clickArea = window;
         clickArea.addEventListener('click', handleClick);
 
         //draw the square that was just added to the DB
