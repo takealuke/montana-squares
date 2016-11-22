@@ -46,44 +46,14 @@
         var squareList = database.ref('/squares/');
 
         function handleClick (ev) {
-            //actually, get the top, left from scroll-proof function. define here. set to var coords. then coords = scrollProof(ev? right?); top = (coords.top - (size/2));, etc
             //Handle coordinates from scrolling 
-            function getOffsetRect(elem) {
-                //make elem into an html object instead of jQuery obj
-                elem = elem.toElement;
+            var scrollTop = window.pageYOffset //|| docElem.scrollTop || body.scrollTop
+            console.log('scrollTop: ' + scrollTop);
+            var scrollLeft = window.pageXOffset //|| docElem.scrollLeft || body.scrollLeft
 
-                //can't use getBoundingClientRect() on a jquery obj. must be an html obj.
-                //this is getting the window i guess? elem is #mainbody, right?
-                var box = elem.getBoundingClientRect()
-                console.log(box);
-                
-                var body = document.body
-                var docElem = document.documentElement
-                
-                console.log("window.pageYOffset: " + window.pageYOffset);
-                console.log('docElem.scrollTop: ' + docElem.scrollTop);
-                console.log('body.scrollTop: ' + body.scrollTop);
-                var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop
-                var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft
-                
-                //for if the elem is not already the main body. not necessary for us i dont think
-                var clientTop = docElem.clientTop || body.clientTop || 0
-                var clientLeft = docElem.clientLeft || body.clientLeft || 0
-                 
-                var top  = box.top +  scrollTop - clientTop
-                var left = box.left + scrollLeft - clientLeft
-                 
-                return { top: Math.round(top), left: Math.round(left) }
-            }
-
-            //get scroll-proof coordinates
-            var offset = getOffsetRect(ev);
-            //this is returning 0, which is a problem. identify why no value within getoffsetrect()
-            console.log('top offset: ' + offset.top);
-
-            //do math for the offset, too
-            var top = (ev.clientY + offset.top - (size/2));
-            var left = (ev.clientX + offset.left - (size/2));
+            //do math for the scrolling offset and to get the point at the center of the square
+            var top = (ev.clientY + scrollTop - (size/2));
+            var left = (ev.clientX + scrollLeft - (size/2));
             
             function writeNewSquare(left, top, color, userId, person) {
                 squareList.push({
